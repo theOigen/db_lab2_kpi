@@ -1,5 +1,6 @@
 package com.lab2.model;
 
+@TableName(name = "marks")
 public class Mark {
     Long id;
     Long teacherId;

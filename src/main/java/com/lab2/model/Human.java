@@ -1,6 +1,6 @@
 package com.lab2.model;
 
-//@Entity(table = "humans")
+@DiscriminationColumn(name = "dtype")
 public abstract class Human {
     Long id;
     String name;

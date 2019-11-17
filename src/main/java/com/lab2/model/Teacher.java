@@ -1,5 +1,7 @@
 package com.lab2.model;
 
+@TableName(name = "human")
+@DiscriminatorValue("student")
 public class Teacher extends  Human {
     String subject;
     String academicDegree;
