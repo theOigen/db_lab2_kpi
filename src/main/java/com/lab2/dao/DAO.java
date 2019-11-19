@@ -14,33 +14,40 @@ public class DAO implements IDAO {
     IDAOImpl<Mark> marksDAOImpl;
     Connection connection;
 
+    public void connect(String url, String user, String password) throws SQLException {
+        connection = DriverManager.getConnection(url, user, password);
+        studentsDAOImpl = new DAOImpl<Student>(Student.class, connection);
+        teachersDAOImpl = new DAOImpl<Teacher>(Teacher.class, connection);
+        marksDAOImpl = new DAOImpl<Mark>(Mark.class, connection);
+    }
+
     @Override
-    public Student getStudent(Long id) {
+    public Student getStudent(Long id) throws SQLException {
         return studentsDAOImpl.getEntity(id);
     }
 
     @Override
-    public List<Student> getStudentList() {
+    public List<Student> getStudentList() throws SQLException {
         return studentsDAOImpl.getEntityList();
     }
 
     @Override
-    public Teacher getTeacher(Long id) {
+    public Teacher getTeacher(Long id) throws SQLException {
         return teachersDAOImpl.getEntity(id);
     }
 
     @Override
-    public List<Teacher> getTeacherList() {
+    public List<Teacher> getTeacherList() throws SQLException {
         return teachersDAOImpl.getEntityList();
     }
 
     @Override
-    public Mark getMark(Long id) {
+    public Mark getMark(Long id) throws SQLException {
         return marksDAOImpl.getEntity(id);
     }
 
     @Override
-    public List<Mark> getMarkList() {
+    public List<Mark> getMarkList() throws SQLException {
         return marksDAOImpl.getEntityList();
     }
 }

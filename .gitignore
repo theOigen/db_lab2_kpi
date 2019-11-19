@@ -111,3 +111,5 @@ gradlew.bat
 settings.gradle
 gradle/
 .idea/
+
+*.properties
