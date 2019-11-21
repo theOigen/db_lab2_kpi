@@ -1,4 +1,3 @@
-import com.lab2.dao.DAO;
 import com.lab2.dao.DAOImpl;
 import com.lab2.model.Student;
 import com.lab2.model.Teacher;
@@ -25,7 +24,7 @@ public class DAOTest {
 
     @Before
     public void init() throws IOException {
-        MockFileDatabase db = new MockFileDatabase(new File(System.getProperty("user.dir") + "/db.test"));
+        MockFileDatabase db = new MockFileDatabase(new File(System.getProperty("user.dir") + "/mocked_db.test"));
         connection = new MockConnection(db);
 
         studentDAO = new DAOImpl<Student>(Student.class, connection);

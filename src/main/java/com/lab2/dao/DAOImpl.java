@@ -39,7 +39,7 @@ public class DAOImpl<T> implements IDAOImpl<T> {
                 String value = resultSet.getString(name);
                 Class type = field.getType();
                 field.set(entity, type.isEnum()
-                        ? type.getDeclaredMethod("fromString", String.class).invoke(null, value)
+                        ? type.getDeclaredMethod("valueOf", String.class).invoke(null, value)
                         : type.getConstructor(String.class).newInstance(value));
             }
         } catch (Exception e) {
