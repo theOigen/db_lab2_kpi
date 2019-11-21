@@ -28,9 +28,9 @@ public class DAOTest {
         MockFileDatabase db = new MockFileDatabase(new File(System.getProperty("user.dir") + "/db.test"));
         connection = new MockConnection(db);
 
-        studentDAO = new DAOImpl<>(Student.class, connection);
-        teacherDAO = new DAOImpl<>(Teacher.class, connection);
-        markDAO = new DAOImpl<>(Mark.class, connection);
+        studentDAO = new DAOImpl<Student>(Student.class, connection);
+        teacherDAO = new DAOImpl<Teacher>(Teacher.class, connection);
+        markDAO = new DAOImpl<Mark>(Mark.class, connection);
     }
 
     @Test
@@ -38,8 +38,8 @@ public class DAOTest {
         List<Student> students = studentDAO.getEntityList();
 
         assertEquals(2, students.size());
-        assertEquals("user1", students.get(0).getName());
-        assertEquals("user2", students.get(1).getName());
+        assertEquals("student_1", students.get(0).getName());
+        assertEquals("student_2", students.get(1).getName());
     }
 
     @Test
@@ -47,14 +47,14 @@ public class DAOTest {
         List<Teacher> teachers = teacherDAO.getEntityList();
 
         assertEquals(2, teachers.size());
-        assertEquals("test1", teachers.get(0).getTeachingExperience());
-        assertEquals("test2", teachers.get(1).getTeachingExperience());
+        assertEquals("degree_1", teachers.get(0).getAcademicDegree());
+        assertEquals("degree_2", teachers.get(1).getAcademicDegree());
     }
 
     @Test
     public void getValidMarkList() throws SQLException {
         List<Mark> marks = markDAO.getEntityList();
-        Long studentId = new Long(1);
+        Long studentId = 1L;
 
         assertEquals(1, marks.size());
         assertEquals(studentId, marks.get(0).getStudentId());
@@ -62,18 +62,18 @@ public class DAOTest {
 
     @Test
     public void getValidStudentById() throws SQLException {
-        Long id = new Long(1);
+        Long id = 1L;
         Student student = studentDAO.getEntity(id);
 
         assertNotNull(student);
         assertEquals(id, student.getId());
-        assertEquals("user1", student.getName());
-        assertEquals("spec1", student.getSpecialization());
+        assertEquals("student_1", student.getName());
+        assertEquals("spec_1", student.getSpecialization());
     }
 
     @Test
-    public void wontFindNonExistingStudentInDB() throws SQLException {
-        Long id = new Long(3);
+    public void getNonExistingStudent() throws SQLException {
+        Long id = 3L;
         Student student = studentDAO.getEntity(id);
 
         assertNull(student);
@@ -81,20 +81,36 @@ public class DAOTest {
 
     @Test
     public void getValidTeacherById() throws SQLException {
-        Long id = new Long(1);
+        Long id = 1L;
         Teacher teacher = teacherDAO.getEntity(id);
 
         assertNotNull(teacher);
         assertEquals(id, teacher.getId());
-        assertEquals("test1", teacher.getSubject());
+        assertEquals("subject_1", teacher.getSubject());
+    }
+
+    @Test
+    public void getNonExistingTeacher() throws SQLException {
+        Long id = 3L;
+        Teacher teacher = teacherDAO.getEntity(id);
+
+        assertNull(teacher);
     }
 
     @Test
     public void getValidMarkById() throws SQLException {
-        Long id = new Long(3);
+        Long id = 3L;
         Mark mark = markDAO.getEntity(id);
 
         assertNotNull(mark);
         assertEquals(id, mark.getId());
+    }
+
+    @Test
+    public void getNonExistingMark() throws SQLException {
+        Long id = 3L;
+        Mark mark = markDAO.getEntity(id);
+
+        assertNull(mark);
     }
 }
