@@ -72,7 +72,7 @@ public class DAOTest {
 
     @Test
     public void getNonExistingStudent() throws SQLException {
-        Long id = 3L;
+        Long id = 10L;
         Student student = studentDAO.getEntity(id);
 
         assertNull(student);
@@ -80,7 +80,7 @@ public class DAOTest {
 
     @Test
     public void getValidTeacherById() throws SQLException {
-        Long id = 1L;
+        Long id = 3L;
         Teacher teacher = teacherDAO.getEntity(id);
 
         assertNotNull(teacher);
@@ -90,7 +90,7 @@ public class DAOTest {
 
     @Test
     public void getNonExistingTeacher() throws SQLException {
-        Long id = 3L;
+        Long id = 5L;
         Teacher teacher = teacherDAO.getEntity(id);
 
         assertNull(teacher);
@@ -98,7 +98,7 @@ public class DAOTest {
 
     @Test
     public void getValidMarkById() throws SQLException {
-        Long id = 3L;
+        Long id = 1L;
         Mark mark = markDAO.getEntity(id);
 
         assertNotNull(mark);
