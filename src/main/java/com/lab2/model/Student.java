@@ -1,5 +1,8 @@
 package com.lab2.model;
 
+import com.lab2.annotations.DiscriminatorValue;
+import com.lab2.annotations.TableName;
+
 @TableName(name = "human")
 @DiscriminatorValue("student")
 public class Student extends Human {

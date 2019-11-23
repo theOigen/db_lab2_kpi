@@ -1,8 +1,8 @@
 package com.lab2.dao;
 
-import com.lab2.model.DiscriminationColumn;
-import com.lab2.model.DiscriminatorValue;
-import com.lab2.model.TableName;
+import com.lab2.annotations.DiscriminationColumn;
+import com.lab2.annotations.DiscriminatorValue;
+import com.lab2.annotations.TableName;
 
 import java.lang.reflect.Field;
 import java.sql.*;

@@ -1,5 +1,7 @@
 package com.lab2.model;
 
+import com.lab2.annotations.DiscriminationColumn;
+
 @DiscriminationColumn(name = "dtype")
 public abstract class Human {
     Long id;

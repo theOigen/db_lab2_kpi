@@ -1,4 +1,4 @@
-package com.lab2.model;
+package com.lab2.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

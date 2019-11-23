@@ -1,5 +1,7 @@
 package com.lab2.model;
 
+import com.lab2.annotations.TableName;
+
 @TableName(name = "marks")
 public class Mark {
     Long id;
