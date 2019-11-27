@@ -5,5 +5,6 @@ import java.util.List;
 
 public interface IDAOImpl<T> {
     T getEntity(Long id) throws SQLException;
+    boolean deleteEntity(T entity) throws SQLException;
     List<T> getEntityList()throws SQLException;
 }

@@ -2,8 +2,10 @@ package com.lab2.dao;
 
 import com.lab2.annotations.DiscriminationColumn;
 import com.lab2.annotations.DiscriminatorValue;
+import com.lab2.annotations.PrimaryKey;
 import com.lab2.annotations.TableName;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;
@@ -102,6 +104,33 @@ public class DAOImpl<T> implements IDAOImpl<T> {
         ResultSet resultSet = preparedStatement.executeQuery();
 
         return resultSetToList(resultSet);
+    }
+
+    @Override
+    public boolean deleteEntity(T entity) throws SQLException {
+        TableName tableAnnotation = clazz.getAnnotation(TableName.class);
+        List<Field> fields = new ArrayList<>();
+        getAllFields(fields, clazz);
+
+        Field primary = null;
+        for (Field field : fields) {
+            field.setAccessible(true);
+            if (field.isAnnotationPresent(PrimaryKey.class)) {
+                primary = field;
+            }
+        }
+
+        String sql = String.format("DELETE FROM public.%s WHERE %s = ?",
+                tableAnnotation.name(), primary.getName());
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        try {
+            preparedStatement.setLong(1, (Long) primary.get(entity));
+            preparedStatement.executeQuery();
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
 }

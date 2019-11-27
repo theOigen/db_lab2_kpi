@@ -27,6 +27,11 @@ public class DAO implements IDAO {
     }
 
     @Override
+    public boolean deleteStudent(Student s) throws SQLException {
+        return studentsDAOImpl.deleteEntity(s);
+    }
+
+    @Override
     public List<Student> getStudentList() throws SQLException {
         return studentsDAOImpl.getEntityList();
     }
@@ -37,6 +42,11 @@ public class DAO implements IDAO {
     }
 
     @Override
+    public boolean deleteTeacher(Teacher t) throws SQLException {
+        return teachersDAOImpl.deleteEntity(t);
+    }
+
+    @Override
     public List<Teacher> getTeacherList() throws SQLException {
         return teachersDAOImpl.getEntityList();
     }
@@ -44,6 +54,11 @@ public class DAO implements IDAO {
     @Override
     public Mark getMark(Long id) throws SQLException {
         return marksDAOImpl.getEntity(id);
+    }
+
+    @Override
+    public boolean deleteMark(Mark m) throws SQLException {
+        return marksDAOImpl.deleteEntity(m);
     }
 
     @Override

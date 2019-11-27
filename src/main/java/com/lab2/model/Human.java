@@ -1,9 +1,12 @@
 package com.lab2.model;
 
 import com.lab2.annotations.DiscriminationColumn;
+import com.lab2.annotations.PrimaryKey;
 
 @DiscriminationColumn(name = "dtype")
 public abstract class Human {
+
+    @PrimaryKey
     Long id;
     String name;
     Integer age;
