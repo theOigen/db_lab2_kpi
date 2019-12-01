@@ -35,6 +35,11 @@ public class DAO implements IDAO {
     }
 
     @Override
+    public Author updateAuthor(Author a) throws SQLException, IllegalAccessException {
+        return authorsDAOImpl.updateEntity(a);
+    }
+
+    @Override
     public List<Author> getAuthorList() throws SQLException {
         return authorsDAOImpl.getEntityList();
     }
@@ -47,6 +52,11 @@ public class DAO implements IDAO {
     @Override
     public boolean deleteBook(Book b) throws SQLException {
         return booksDAOImpl.deleteEntity(b);
+    }
+
+    @Override
+    public Book updateBook(Book b) throws SQLException, IllegalAccessException {
+        return booksDAOImpl.updateEntity(b);
     }
 
     @Override
@@ -65,6 +75,11 @@ public class DAO implements IDAO {
     }
 
     @Override
+    public Reader updateReader(Reader r) throws SQLException, IllegalAccessException {
+        return readersDAOImpl.updateEntity(r);
+    }
+
+    @Override
     public List<Reader> getReaderList() throws SQLException {
         return readersDAOImpl.getEntityList();
     }
@@ -77,6 +92,11 @@ public class DAO implements IDAO {
     @Override
     public boolean deleteSubscription(Subscription s) throws SQLException {
         return subscriptionsDAOImpl.deleteEntity(s);
+    }
+
+    @Override
+    public Subscription updateSubscription(Subscription s) throws SQLException, IllegalAccessException {
+        return subscriptionsDAOImpl.updateEntity(s);
     }
 
     @Override
