@@ -108,16 +108,7 @@ public class DAOImpl<T> implements IDAOImpl<T> {
     @Override
     public boolean deleteEntity(T entity) throws SQLException {
         TableName tableAnnotation = clazz.getAnnotation(TableName.class);
-        List<Field> fields = new ArrayList<>();
-        getAllFields(fields, clazz);
-
-        Field primary = null;
-        for (Field field : fields) {
-            field.setAccessible(true);
-            if (field.isAnnotationPresent(PrimaryKey.class)) {
-                primary = field;
-            }
-        }
+        Field primary = getPrimaryField();
 
         String sql = String.format("DELETE FROM public.%s WHERE %s = ?",
                 tableAnnotation.name(), primary.getName());
@@ -130,6 +121,69 @@ public class DAOImpl<T> implements IDAOImpl<T> {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public T updateEntity(T entity) throws SQLException, IllegalAccessException {
+        TableName tableAnnotation = clazz.getAnnotation(TableName.class);
+        Field primary = getPrimaryField();
+
+        String sql = String.format("UPDATE public.%s SET %s WHERE %s = ? RETURNING *;",
+                tableAnnotation.name(), getFieldSqlString(entity), primary.getName());
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setLong(1, (Long) primary.get(entity));
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        T updatedEntity;
+        try {
+            updatedEntity = resultSetToList(resultSet).get(0);
+        } catch (IndexOutOfBoundsException ex) {
+            updatedEntity = null;
+        }
+
+        return updatedEntity;
+    }
+
+    private Field getPrimaryField() {
+        List<Field> fields = new ArrayList<>();
+        getAllFields(fields, clazz);
+
+        Field primaryField = null;
+        for(Field field: fields) {
+            field.setAccessible(true);
+            if (field.isAnnotationPresent(PrimaryKey.class)) {
+                primaryField = field;
+            }
+        }
+        return primaryField;
+    }
+
+    private String getFieldSqlString(T entity) throws IllegalAccessException {
+        List<Field> fields = new ArrayList<>();
+        getAllFields(fields, clazz);
+
+        DiscriminationColumn columnAnnotation = clazz.getAnnotation(DiscriminationColumn.class);
+        String discriminatorColumn = columnAnnotation != null ? columnAnnotation.name() : null;
+        DiscriminatorValue discriminatorAnnotation = clazz.getAnnotation(DiscriminatorValue.class);
+        String discriminator = discriminatorAnnotation != null ? discriminatorAnnotation.value() : null;
+
+
+        StringBuilder sql = new StringBuilder();
+        for(int fieldId = 0; fieldId < fields.size(); fieldId++) {
+            Field field = fields.get(fieldId);
+            field.setAccessible(true);
+            sql.append(String.format("%s = %s", field.getName(), field.get(entity)));
+            if(fieldId != fields.size() - 1) {
+                sql.append(", ");
+            }
+        }
+
+        if(discriminatorColumn != null) {
+            sql.append(String.format(", %s = %s", discriminatorColumn, discriminator));
+        }
+
+        return sql.toString();
     }
 
 }
