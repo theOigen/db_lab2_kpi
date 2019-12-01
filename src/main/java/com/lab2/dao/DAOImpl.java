@@ -5,7 +5,6 @@ import com.lab2.annotations.DiscriminatorValue;
 import com.lab2.annotations.PrimaryKey;
 import com.lab2.annotations.TableName;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;

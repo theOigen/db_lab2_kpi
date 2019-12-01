@@ -1,68 +1,86 @@
 package com.lab2.dao;
 
-import com.lab2.model.Mark;
-import com.lab2.model.Student;
-import com.lab2.model.Teacher;
+import com.lab2.model.Author;
+import com.lab2.model.Book;
+import com.lab2.model.Reader;
+import com.lab2.model.Subscription;
 
 import java.sql.*;
 import java.util.List;
 
 public class DAO implements IDAO {
 
-    IDAOImpl<Student> studentsDAOImpl;
-    IDAOImpl<Teacher> teachersDAOImpl;
-    IDAOImpl<Mark> marksDAOImpl;
+    IDAOImpl<Author> authorsDAOImpl;
+    IDAOImpl<Book> booksDAOImpl;
+    IDAOImpl<Reader> readersDAOImpl;
+    IDAOImpl<Subscription> subscriptionsDAOImpl;
     Connection connection;
 
     public void connect(String url, String user, String password) throws SQLException {
         connection = DriverManager.getConnection(url, user, password);
-        studentsDAOImpl = new DAOImpl<Student>(Student.class, connection);
-        teachersDAOImpl = new DAOImpl<Teacher>(Teacher.class, connection);
-        marksDAOImpl = new DAOImpl<Mark>(Mark.class, connection);
+        authorsDAOImpl = new DAOImpl<>(Author.class, connection);
+        booksDAOImpl = new DAOImpl<>(Book.class, connection);
+        readersDAOImpl = new DAOImpl<>(Reader.class, connection);
+        subscriptionsDAOImpl = new DAOImpl<>(Subscription.class, connection);
     }
 
     @Override
-    public Student getStudent(Long id) throws SQLException {
-        return studentsDAOImpl.getEntity(id);
+    public Author getAuthor(Long id) throws SQLException {
+        return authorsDAOImpl.getEntity(id);
     }
 
     @Override
-    public boolean deleteStudent(Student s) throws SQLException {
-        return studentsDAOImpl.deleteEntity(s);
+    public boolean deleteAuthor(Author a) throws SQLException {
+        return authorsDAOImpl.deleteEntity(a);
     }
 
     @Override
-    public List<Student> getStudentList() throws SQLException {
-        return studentsDAOImpl.getEntityList();
+    public List<Author> getAuthorList() throws SQLException {
+        return authorsDAOImpl.getEntityList();
     }
 
     @Override
-    public Teacher getTeacher(Long id) throws SQLException {
-        return teachersDAOImpl.getEntity(id);
+    public Book getBook(Long id) throws SQLException {
+        return booksDAOImpl.getEntity(id);
     }
 
     @Override
-    public boolean deleteTeacher(Teacher t) throws SQLException {
-        return teachersDAOImpl.deleteEntity(t);
+    public boolean deleteBook(Book b) throws SQLException {
+        return booksDAOImpl.deleteEntity(b);
     }
 
     @Override
-    public List<Teacher> getTeacherList() throws SQLException {
-        return teachersDAOImpl.getEntityList();
+    public List<Book> getBookList() throws SQLException {
+        return booksDAOImpl.getEntityList();
     }
 
     @Override
-    public Mark getMark(Long id) throws SQLException {
-        return marksDAOImpl.getEntity(id);
+    public Reader getReader(Long id) throws SQLException {
+        return readersDAOImpl.getEntity(id);
     }
 
     @Override
-    public boolean deleteMark(Mark m) throws SQLException {
-        return marksDAOImpl.deleteEntity(m);
+    public boolean deleteReader(Reader r) throws SQLException {
+        return readersDAOImpl.deleteEntity(r);
     }
 
     @Override
-    public List<Mark> getMarkList() throws SQLException {
-        return marksDAOImpl.getEntityList();
+    public List<Reader> getReaderList() throws SQLException {
+        return readersDAOImpl.getEntityList();
+    }
+
+    @Override
+    public Subscription getSubscription(Long id) throws SQLException {
+        return subscriptionsDAOImpl.getEntity(id);
+    }
+
+    @Override
+    public boolean deleteSubscription(Subscription s) throws SQLException {
+        return subscriptionsDAOImpl.deleteEntity(s);
+    }
+
+    @Override
+    public List<Subscription> getSubscriptionList() throws SQLException {
+        return subscriptionsDAOImpl.getEntityList();
     }
 }
