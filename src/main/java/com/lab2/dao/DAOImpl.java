@@ -21,14 +21,13 @@ public class DAOImpl<T> implements IDAOImpl<T> {
         this.connection = connection;
     }
 
-    private List<Field> getAllFields(List<Field> fields, Class<?> type) {
+    private void getAllFields(List<Field> fields, Class<?> type) {
         fields.addAll(Arrays.asList(type.getDeclaredFields()));
 
         if (type.getSuperclass() != null) {
             getAllFields(fields, type.getSuperclass());
         }
 
-        return fields;
     }
 
     private T createEntity(ResultSet resultSet, List<Field> fields) {
@@ -157,6 +156,80 @@ public class DAOImpl<T> implements IDAOImpl<T> {
             }
         }
         return primaryField;
+    }
+
+    private String getRowsString(T entity) throws IllegalAccessException {
+        List<Field> fields = new ArrayList<>();
+        getAllFields(fields, clazz);
+
+        List<String> rows = new ArrayList<>();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Object value = field.get(entity);
+            if (value != null) {
+                rows.add(field.getName());
+            }
+        }
+
+        return String.join(", ", rows);
+    }
+
+    private String getValuesPrepareString(T entity) throws IllegalAccessException {
+        List<Field> fields = new ArrayList<>();
+        getAllFields(fields, clazz);
+
+        List<String> values = new ArrayList<>();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Object value = field.get(entity);
+            if (value != null) {
+                values.add("?");
+            }
+        }
+
+        return String.join(", ", values);
+    }
+
+
+    @Override
+    public boolean insertEntity(T entity) throws SQLException, IllegalAccessException {
+        TableName tableAnnotation = clazz.getAnnotation(TableName.class);
+        List<Field> fields = new ArrayList<>();
+        getAllFields(fields, clazz);
+
+        String sql = String.format("INSERT INTO public.%s (%s) VALUES (%s) RETURNING *;",
+                tableAnnotation.name(), getRowsString(entity), getValuesPrepareString(entity));
+
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY
+        );
+
+
+        int parameterIndex = 1;
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Class type = field.getType();
+            Object value = field.get(entity);
+
+            if (value != null) {
+                if (type == Long.class) {
+                    preparedStatement.setLong(parameterIndex, (Long) field.get(entity));
+                } else {
+                    preparedStatement.setString(parameterIndex, String.valueOf(field.get(entity)));
+                }
+                parameterIndex += 1;
+            }
+        }
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+        T insertedEntity;
+        try {
+            insertedEntity = resultSetToList(resultSet).get(0);
+        } catch (IndexOutOfBoundsException ex) {
+            insertedEntity = null;
+        }
+
+        return insertedEntity != null;
     }
 
     private String getFieldSqlString(T entity) throws IllegalAccessException {

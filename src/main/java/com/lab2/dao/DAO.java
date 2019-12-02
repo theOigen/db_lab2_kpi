@@ -10,14 +10,13 @@ import java.util.List;
 
 public class DAO implements IDAO {
 
-    IDAOImpl<Author> authorsDAOImpl;
-    IDAOImpl<Book> booksDAOImpl;
-    IDAOImpl<Reader> readersDAOImpl;
-    IDAOImpl<Subscription> subscriptionsDAOImpl;
-    Connection connection;
+    private IDAOImpl<Author> authorsDAOImpl;
+    private IDAOImpl<Book> booksDAOImpl;
+    private IDAOImpl<Reader> readersDAOImpl;
+    private IDAOImpl<Subscription> subscriptionsDAOImpl;
 
     public void connect(String url, String user, String password) throws SQLException {
-        connection = DriverManager.getConnection(url, user, password);
+        Connection connection = DriverManager.getConnection(url, user, password);
         authorsDAOImpl = new DAOImpl<>(Author.class, connection);
         booksDAOImpl = new DAOImpl<>(Book.class, connection);
         readersDAOImpl = new DAOImpl<>(Reader.class, connection);
@@ -37,6 +36,11 @@ public class DAO implements IDAO {
     @Override
     public Author updateAuthor(Author a) throws SQLException, IllegalAccessException {
         return authorsDAOImpl.updateEntity(a);
+    }
+
+    @Override
+    public boolean insertAuthor(Author a) throws SQLException, IllegalAccessException {
+        return authorsDAOImpl.insertEntity(a);
     }
 
     @Override
@@ -60,6 +64,11 @@ public class DAO implements IDAO {
     }
 
     @Override
+    public boolean insertBook(Book b) throws SQLException, IllegalAccessException {
+        return booksDAOImpl.insertEntity(b);
+    }
+
+    @Override
     public List<Book> getBookList() throws SQLException {
         return booksDAOImpl.getEntityList();
     }
@@ -80,6 +89,11 @@ public class DAO implements IDAO {
     }
 
     @Override
+    public boolean insertReader(Reader r) throws SQLException, IllegalAccessException {
+        return readersDAOImpl.insertEntity(r);
+    }
+
+    @Override
     public List<Reader> getReaderList() throws SQLException {
         return readersDAOImpl.getEntityList();
     }
@@ -97,6 +111,11 @@ public class DAO implements IDAO {
     @Override
     public Subscription updateSubscription(Subscription s) throws SQLException, IllegalAccessException {
         return subscriptionsDAOImpl.updateEntity(s);
+    }
+
+    @Override
+    public boolean insertSubscription(Subscription s) throws SQLException, IllegalAccessException {
+        return subscriptionsDAOImpl.insertEntity(s);
     }
 
     @Override
