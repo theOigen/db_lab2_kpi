@@ -128,10 +128,11 @@ public class DAO implements IDAO {
     public List<Book> searchWord(String word, boolean including) throws SQLException {
         String sql = "SELECT bid, pages_count, title, genre, original_language, author,"
                 + " ts_headline(title, q, 'StartSel=<!>, StopSel=<!>') as title,"
-                + " ts_headline(genre, q, 'StartSel=<!>, StopSel=<!>') as genre"
+                + " ts_headline(genre, q, 'StartSel=<!>, StopSel=<!>') as genre,"
+                + " ts_headline(original_language, q, 'StartSel=<!>, StopSel=<!>') as original_language"
                 + " FROM public.book , to_tsquery(?) as q"
                 + " WHERE " + (including ? "" : "not")
-                + " to_tsvector(title) || to_tsvector(genre) @@ q";
+                + " to_tsvector(title) || to_tsvector(genre) || to_tsvector(original_language) @@ q";
 
         PreparedStatement preparedStatement = connection.prepareStatement(
                 sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY
@@ -145,7 +146,7 @@ public class DAO implements IDAO {
     @Override
     public ResultSet joinedBookSearch(int pagesStart, int pagesEnd, boolean isAuthorAlive) throws SQLException {
         String sql = "SELECT * FROM public.book INNER JOIN public.author ON author.aid = book.author "
-                + "WHERE (Ωisalive = ? AND pages_count BETWEEN ? AND ?)";
+                + "WHERE (isalive = ? AND pages_count BETWEEN ? AND ?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(
                 sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY
