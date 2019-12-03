@@ -12,14 +12,16 @@ public class Author {
     String name;
     Date birth_date;
     String nationality;
+    boolean isalive;
 
     public Author() {}
 
-    public Author(Long aid, String name, Date birth_date, String nationality) {
+    public Author(Long aid, String name, Date birth_date, String nationality, boolean isALive) {
         this.aid = aid;
         this.name = name;
         this.birth_date = birth_date;
         this.nationality = nationality;
+        this.isalive = isALive;
     }
 
     public Long getAid() {
@@ -38,6 +40,10 @@ public class Author {
         return nationality;
     }
 
+    public boolean isAlive() {
+        return isalive;
+    }
+
     public void setAid(Long aid) {
         this.aid = aid;
     }
@@ -52,5 +58,9 @@ public class Author {
 
     public void setNationality(String nationality) {
         this.nationality = nationality;
+    }
+
+    public void setAlive(boolean alive) {
+        isalive = alive;
     }
 }

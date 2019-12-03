@@ -1,7 +1,4 @@
 import com.lab2.dao.DAOImpl;
-import com.lab2.model.Student;
-import com.lab2.model.Teacher;
-import com.lab2.model.Mark;
 import org.jooq.tools.jdbc.MockConnection;
 import org.jooq.tools.jdbc.MockFileDatabase;
 import org.junit.Before;

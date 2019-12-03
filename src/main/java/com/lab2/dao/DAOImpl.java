@@ -1,15 +1,15 @@
 package com.lab2.dao;
 
-import com.lab2.annotations.DiscriminationColumn;
-import com.lab2.annotations.DiscriminatorValue;
 import com.lab2.annotations.PrimaryKey;
 import com.lab2.annotations.TableName;
 
 import java.lang.reflect.Field;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Date;
 
 public class DAOImpl<T> implements IDAOImpl<T> {
 
@@ -38,9 +38,15 @@ public class DAOImpl<T> implements IDAOImpl<T> {
                 String name = field.getName();
                 String value = resultSet.getString(name);
                 Class type = field.getType();
-                field.set(entity, type.isEnum()
-                        ? type.getDeclaredMethod("valueOf", String.class).invoke(null, value)
-                        : type.getConstructor(String.class).newInstance(value));
+                if (value != null) {
+                    if (type == boolean.class) {
+                        field.set(entity, resultSet.getBoolean(name));
+                    } else if (type == java.util.Date.class) {
+                        field.set(entity, resultSet.getDate(name));
+                    } else {
+                        field.set(entity, type.getConstructor(String.class).newInstance(value));
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,12 +55,7 @@ public class DAOImpl<T> implements IDAOImpl<T> {
         return entity;
     }
 
-    private List<T> resultSetToList(ResultSet resultSet) throws SQLException {
-        DiscriminationColumn columnAnnotation = clazz.getAnnotation(DiscriminationColumn.class);
-        String discriminatorColumn = columnAnnotation == null ? null : columnAnnotation.name();
-        DiscriminatorValue discriminatorAnnotation = clazz.getAnnotation(DiscriminatorValue.class);
-        String discriminator = discriminatorAnnotation == null ? null : discriminatorAnnotation.value();
-
+    public List<T> resultSetToList(ResultSet resultSet) throws SQLException {
         List<Field> fields = new ArrayList<>();
         getAllFields(fields, clazz);
 
@@ -63,10 +64,8 @@ public class DAOImpl<T> implements IDAOImpl<T> {
         List<T> list = new ArrayList<>();
         resultSet.beforeFirst();
         while (resultSet.next()) {
-            if(discriminatorColumn == null || resultSet.getString(discriminatorColumn).equals(discriminator)) {
-                T entity = createEntity(resultSet, fields);
-                list.add(entity);
-            }
+            T entity = createEntity(resultSet, fields);
+            list.add(entity);
         }
         return list;
     }
@@ -75,8 +74,9 @@ public class DAOImpl<T> implements IDAOImpl<T> {
     public T getEntity(Long id) throws SQLException {
         T entity;
         TableName tableAnnotation = clazz.getAnnotation(TableName.class);
+        Field primary = getPrimaryField();
 
-        String sql = String.format("SELECT * FROM public.%s WHERE id = ?", tableAnnotation.name());
+        String sql = String.format("SELECT * FROM public.%s WHERE %s = ?", tableAnnotation.name(), primary.getName());
         PreparedStatement preparedStatement = connection.prepareStatement(
                 sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY
         );
@@ -105,21 +105,25 @@ public class DAOImpl<T> implements IDAOImpl<T> {
     }
 
     @Override
-    public boolean deleteEntity(T entity) throws SQLException {
+    public T deleteEntity(Long id) throws SQLException {
         TableName tableAnnotation = clazz.getAnnotation(TableName.class);
         Field primary = getPrimaryField();
 
-        String sql = String.format("DELETE FROM public.%s WHERE %s = ?",
+        String sql = String.format("DELETE FROM public.%s WHERE %s = ? RETURNING *;",
                 tableAnnotation.name(), primary.getName());
 
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        preparedStatement.setLong(1, id);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        T deletedEntity;
         try {
-            preparedStatement.setLong(1, (Long) primary.get(entity));
-            preparedStatement.executeQuery();
-        } catch (Exception e) {
-            return false;
+            deletedEntity = resultSetToList(resultSet).get(0);
+        } catch (IndexOutOfBoundsException ex) {
+            deletedEntity = null;
         }
-        return true;
+
+        return deletedEntity;
     }
 
     @Override
@@ -130,7 +134,7 @@ public class DAOImpl<T> implements IDAOImpl<T> {
         String sql = String.format("UPDATE public.%s SET %s WHERE %s = ? RETURNING *;",
                 tableAnnotation.name(), getFieldSqlString(entity), primary.getName());
 
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         preparedStatement.setLong(1, (Long) primary.get(entity));
         ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -192,7 +196,7 @@ public class DAOImpl<T> implements IDAOImpl<T> {
 
 
     @Override
-    public boolean insertEntity(T entity) throws SQLException, IllegalAccessException {
+    public T insertEntity(T entity) throws SQLException, IllegalAccessException {
         TableName tableAnnotation = clazz.getAnnotation(TableName.class);
         List<Field> fields = new ArrayList<>();
         getAllFields(fields, clazz);
@@ -214,6 +218,13 @@ public class DAOImpl<T> implements IDAOImpl<T> {
             if (value != null) {
                 if (type == Long.class) {
                     preparedStatement.setLong(parameterIndex, (Long) field.get(entity));
+                } else if (type == boolean.class) {
+                    preparedStatement.setBoolean(parameterIndex, (boolean) field.get(entity));
+                } else if (type == java.util.Date.class) {
+                    java.sql.Date date = new java.sql.Date(((java.util.Date) field.get(entity)).getTime());
+                    preparedStatement.setDate(parameterIndex, date);
+                } else if (type == Integer.class) {
+                    preparedStatement.setInt(parameterIndex, (Integer) field.get(entity));
                 } else {
                     preparedStatement.setString(parameterIndex, String.valueOf(field.get(entity)));
                 }
@@ -229,31 +240,21 @@ public class DAOImpl<T> implements IDAOImpl<T> {
             insertedEntity = null;
         }
 
-        return insertedEntity != null;
+        return insertedEntity;
     }
 
     private String getFieldSqlString(T entity) throws IllegalAccessException {
         List<Field> fields = new ArrayList<>();
         getAllFields(fields, clazz);
 
-        DiscriminationColumn columnAnnotation = clazz.getAnnotation(DiscriminationColumn.class);
-        String discriminatorColumn = columnAnnotation != null ? columnAnnotation.name() : null;
-        DiscriminatorValue discriminatorAnnotation = clazz.getAnnotation(DiscriminatorValue.class);
-        String discriminator = discriminatorAnnotation != null ? discriminatorAnnotation.value() : null;
-
-
         StringBuilder sql = new StringBuilder();
         for(int fieldId = 0; fieldId < fields.size(); fieldId++) {
             Field field = fields.get(fieldId);
             field.setAccessible(true);
-            sql.append(String.format("%s = %s", field.getName(), field.get(entity)));
+            sql.append(String.format("%s = '%s'", field.getName(), field.get(entity)));
             if(fieldId != fields.size() - 1) {
                 sql.append(", ");
             }
-        }
-
-        if(discriminatorColumn != null) {
-            sql.append(String.format(", %s = %s", discriminatorColumn, discriminator));
         }
 
         return sql.toString();
