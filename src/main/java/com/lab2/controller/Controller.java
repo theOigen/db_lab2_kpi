@@ -253,7 +253,7 @@ public class Controller {
             case 1: {
                 Author author = new Author(
                         null,
-                        view.getStringOption("username"),
+                        view.getStringOption("author"),
                         new Date(),
                         view.getStringOption("nationality"),
                         view.getBooleanOption("is author alive")
