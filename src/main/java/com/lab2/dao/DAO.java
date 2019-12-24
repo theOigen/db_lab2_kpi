@@ -6,6 +6,7 @@ import com.lab2.model.Reader;
 import com.lab2.model.Subscription;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DAO implements IDAO {
@@ -137,7 +138,8 @@ public class DAO implements IDAO {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY
         );
-        preparedStatement.setString(1, word);
+        String searchedWord = word.replace(" ", " | ");
+        preparedStatement.setString(1, searchedWord);
         ResultSet resultSet = preparedStatement.executeQuery();
 
         return booksDAOImpl.resultSetToList(resultSet);
