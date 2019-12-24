@@ -103,13 +103,18 @@ public class View {
         System.out.println("Name: " + a.getName());
         System.out.println("Nationality: " + a.getNationality());
         System.out.println("Birth date: " + a.getBirth_date().toString());
+        List<Book> books = a.getBooks();
+        if (books != null) {
+            System.out.println("Books by this author: " + books.size());
+            printBooks(a.getBooks());
+        }
     }
 
     public void printBookInfo(Book b) {
         printHR();
         System.out.println("ID: " + b.getBid());
         System.out.println("Title: " + b.getTitle());
-        System.out.println("Author: " + b.getAuthor());
+        System.out.println("Author: " + b.getAuthor() + ") " + b.getAuthorOf().getName());
         System.out.println("Genre: " + b.getGenre());
         System.out.println("Original language: " + b.getOriginal_language());
         System.out.println("Pages count: " + b.getPages_count());
@@ -121,7 +126,13 @@ public class View {
         System.out.println("Name: " + r.getName());
         System.out.println("Age: " + r.getAge());
         System.out.println("Favourite genre: " + r.getFavourite_genre());
-        System.out.println("Read books count: " + r.getFinished_books());
+        System.out.println("Read books: " + r.getFinished_books());
+        printBooks(r.getBooks());
+        List<Subscription> subscriptions = r.getSubscriptionList();
+        if (subscriptions != null) {
+            System.out.println("Subscriptions: " + subscriptions.size());
+            printSubscriptions(subscriptions);
+        }
     }
 
     public void printSubscriptionInfo(Subscription s) {
@@ -129,7 +140,7 @@ public class View {
         System.out.println("ID: " + s.getSid());
         System.out.println("Type: " + s.getType());
         System.out.println("Validity: " + s.getValidity());
-        System.out.println("Owner: " + s.getOwner());
+        System.out.println("Owner: " + s.getOwner() + ") " + s.getOwnerOf().getName());
         System.out.println("Price: " + s.getPrice());
     }
 

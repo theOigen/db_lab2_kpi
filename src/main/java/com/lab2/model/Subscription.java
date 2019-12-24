@@ -1,16 +1,37 @@
 package com.lab2.model;
 
-import com.lab2.annotations.PrimaryKey;
-import com.lab2.annotations.TableName;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@TableName(name="subscription")
+@Entity
+@Table(name="subscription")
 public class Subscription {
-    @PrimaryKey
-    Long sid;
-    String type;
-    Integer price;
-    String validity;
-    Long owner;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long sid;
+
+    private String type;
+    private Integer price;
+    private String validity;
+
+    @Column(name = "owner", insertable = false, updatable = false)
+    private Long owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner")
+    private Reader ownerOf;
+
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(name = "subscription_book",
+            joinColumns = @JoinColumn(name = "sid"),
+            inverseJoinColumns = @JoinColumn(name = "bid")
+    )
+    private List<Book> books = new ArrayList<>();
 
     public Subscription() {}
 
@@ -20,6 +41,22 @@ public class Subscription {
         this.price = price;
         this.validity = validity;
         this.owner = owner;
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
+
+    public Reader getOwnerOf() {
+        return ownerOf;
+    }
+
+    public void setOwnerOf(Reader ownerOf) {
+        this.ownerOf = ownerOf;
     }
 
     public Long getSid() {

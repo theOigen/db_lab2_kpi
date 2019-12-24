@@ -1,18 +1,26 @@
 package com.lab2.model;
 
-import com.lab2.annotations.PrimaryKey;
-import com.lab2.annotations.TableName;
+
+import javax.persistence.*;
 
 import java.util.Date;
+import java.util.List;
 
-@TableName(name="author")
+@Entity
+@Table(name="author")
 public class Author {
-    @PrimaryKey
-    Long aid;
-    String name;
-    Date birth_date;
-    String nationality;
-    boolean isalive;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long aid;
+
+    private String name;
+    private Date birth_date;
+    private String nationality;
+    private boolean isalive;
+
+    @OneToMany(mappedBy = "authorOf", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Book> books;
 
     public Author() {}
 
@@ -22,6 +30,14 @@ public class Author {
         this.birth_date = birth_date;
         this.nationality = nationality;
         this.isalive = isALive;
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
     }
 
     public Long getAid() {

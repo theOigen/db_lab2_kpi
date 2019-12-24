@@ -85,7 +85,8 @@ public class Controller {
                     List<Book> books = dao.searchWord(
                             view.getStringOption("word"),
                             view.getBooleanOption("including(true/false)"));
-                    view.printBooks(books);
+                    if (books != null)
+                        view.printBooks(books);
                     break;
                 }
                 case 7: {

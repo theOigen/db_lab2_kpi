@@ -10,6 +10,6 @@ public interface IDAOImpl<T> {
     List<T> getEntityList()throws SQLException;
     T updateEntity(T entity) throws SQLException, IllegalAccessException;
     T insertEntity(T entity) throws SQLException, IllegalAccessException;
-
+    List<T> insertEntityList(List<T> entities);
     List<T> resultSetToList(ResultSet resultSet) throws SQLException;
 }

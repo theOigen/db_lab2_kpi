@@ -18,10 +18,10 @@ public class DAO implements IDAO {
 
     public void connect(String url, String user, String password) throws SQLException {
         connection = DriverManager.getConnection(url, user, password);
-        authorsDAOImpl = new DAOImpl<>(Author.class, connection);
-        booksDAOImpl = new DAOImpl<>(Book.class, connection);
-        readersDAOImpl = new DAOImpl<>(Reader.class, connection);
-        subscriptionsDAOImpl = new DAOImpl<>(Subscription.class, connection);
+        authorsDAOImpl = new DAOImpl<>(Author.class);
+        booksDAOImpl = new DAOImpl<>(Book.class);
+        readersDAOImpl = new DAOImpl<>(Reader.class);
+        subscriptionsDAOImpl = new DAOImpl<>(Subscription.class);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class DAO implements IDAO {
                 + " ts_headline(title, q, 'StartSel=<!>, StopSel=<!>') as title,"
                 + " ts_headline(genre, q, 'StartSel=<!>, StopSel=<!>') as genre,"
                 + " ts_headline(original_language, q, 'StartSel=<!>, StopSel=<!>') as original_language"
-                + " FROM public.book , to_tsquery(?) as q"
+                + " FROM public.book , plainto_tsquery(?) as q"
                 + " WHERE " + (including ? "" : "not")
                 + " to_tsvector(title) || to_tsvector(genre) || to_tsvector(original_language) @@ q";
 

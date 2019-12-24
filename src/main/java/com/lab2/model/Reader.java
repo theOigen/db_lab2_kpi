@@ -1,16 +1,34 @@
 package com.lab2.model;
 
-import com.lab2.annotations.PrimaryKey;
-import com.lab2.annotations.TableName;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@TableName(name="reader")
+@Entity
+@Table(name="reader")
 public class Reader {
-    @PrimaryKey
-    Long rid;
-    String name;
-    String favourite_genre;
-    Integer age;
-    Integer finished_books;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long rid;
+
+    private String name;
+    private String favourite_genre;
+    private Integer age;
+    private Integer finished_books;
+
+    @OneToMany(mappedBy = "ownerOf", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subscription> subscriptionList;
+
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(name = "reader_book",
+            joinColumns = @JoinColumn(name = "rid"),
+            inverseJoinColumns = @JoinColumn(name = "bid")
+    )
+    private List<Book> books = new ArrayList<>();
 
     public Reader() {}
 
@@ -20,6 +38,23 @@ public class Reader {
         this.favourite_genre = favourite_genre;
         this.age = age;
         this.finished_books = finished_books;
+        this.subscriptionList = new ArrayList<>();
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
+
+    public List<Subscription> getSubscriptionList() {
+        return subscriptionList;
+    }
+
+    public void setSubscriptionList(List<Subscription> subscriptionList) {
+        this.subscriptionList = subscriptionList;
     }
 
     public Long getRid() {

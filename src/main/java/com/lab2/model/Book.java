@@ -1,17 +1,34 @@
 package com.lab2.model;
 
-import com.lab2.annotations.PrimaryKey;
-import com.lab2.annotations.TableName;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@TableName(name="book")
+@Entity
+@Table(name="book")
 public class Book {
-    @PrimaryKey
-    Long bid;
-    String title;
-    Integer pages_count;
-    String genre;
-    String original_language;
-    Long author;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long bid;
+
+    private String title;
+    private Integer pages_count;
+    private String genre;
+    private String original_language;
+
+    @Column(name = "author", insertable = false, updatable = false)
+    private Long author;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author")
+    private Author authorOf;
+
+    @ManyToMany(mappedBy = "books")
+    private List<Reader> readers = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "books")
+    private List<Subscription> subscriptions = new ArrayList<>();
 
     public Book() {}
 
@@ -22,6 +39,14 @@ public class Book {
         this.genre = genre;
         this.original_language = original_language;
         this.author = author;
+    }
+
+    public Author getAuthorOf() {
+        return authorOf;
+    }
+
+    public void setAuthorOf(Author authorOf) {
+        this.authorOf = authorOf;
     }
 
     public Long getBid() {
